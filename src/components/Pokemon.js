@@ -93,38 +93,27 @@ export const Pokemons = () => {
                 <Grid item xs={6}>
                     <h1>Pokemon details</h1>
                     {
-                        pokemonDetails !== null ?
+                        pokemonDetails ?
                             <Card>
                                 <Grid container justifyContent="center" spacing={3}>
                                     <Grid item xs={4}>
-                                        {
-                                            pokemonDetails?.sprites.front_default !== null ?
-                                                <div>
-                                                    <CardMedia
-                                                        component="img"
-                                                        alt={pokemonDetails.name}
-                                                        image={pokemonDetails.sprites.front_default}
-                                                    />
-                                                    <h4>Normal</h4>
-                                                </div>
-                                                :
-                                                null
-                                        }
-
+                                        <CardMedia
+                                            component="img"
+                                            alt={pokemonDetails.name}
+                                            image={pokemonDetails?.sprites?.front_default}
+                                        />
+                                        <h4>Normal</h4>
                                     </Grid>
                                     <Grid item xs={4}>
-                                        {
-                                            pokemonDetails?.sprites.front_shiny !== null ?
-                                                <div>
-                                                    <CardMedia
-                                                        component="img"
-                                                        alt={pokemonDetails.name}
-                                                        image={pokemonDetails.sprites.front_shiny}
-                                                    />
-                                                    <h4>Shiny</h4>
-                                                </div>
-                                                : null
-                                        }
+
+                                        <CardMedia
+                                            component="img"
+                                            alt={pokemonDetails.name}
+                                            image={pokemonDetails.sprites?.front_shiny}
+                                        />
+                                        <h4>Shiny</h4>
+
+
                                     </Grid>
                                 </Grid>
                                 <Typography gutterBottom variant="h4" component="div">
@@ -132,13 +121,7 @@ export const Pokemons = () => {
                                 </Typography>
                                 <h3>Types :</h3>
                                 {
-                                    pokemonDetails.types.length > 1 ?
-                                        <h3>Types :</h3>
-                                        :
-                                        <h3>Type : </h3>
-                                }
-                                {
-                                    pokemonDetails?.types.map((type, index) => {
+                                    pokemonDetails?.types?.map((type, index) => {
                                         return (
                                             <p id={index}>{type.type.name}</p>
                                         )
