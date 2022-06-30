@@ -8,12 +8,24 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import { CardActions } from '@mui/material';
+import Stack from '@mui/material/Stack';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 export const Pokemons = () => {
 
     const [pokemons, setPokemon] = React.useState([]);
     const [pokemonDetails, setPokemonDetails] = React.useState([]);
     const [myTeam, setMyTeam] = React.useState([]);
+    const [isTeamComplete, setTeamComplete] = React.useState(false);
+
+    const [isAlertOpen, setOpenAlert] = React.useState(false);
+    const [alertType, setAlertType] = React.useState("");
+    const [alertMessage, setAlertMessage] = React.useState("");
 
     React.useEffect(() => {
         GetPokemon('https://pokeapi.co/api/v2/pokemon');
@@ -52,6 +64,11 @@ export const Pokemons = () => {
 
     const loadStorage = () => {
         const team = JSON.parse(localStorage.getItem('my-Team')) || []
+        if (team.length >= 6) {
+            setTeamComplete(true);
+        } else {
+            setTeamComplete(false);
+        }
         setMyTeam(team);
     }
 
@@ -60,30 +77,54 @@ export const Pokemons = () => {
     }
 
     const addToTeam = (pokemon) => {
-        myTeam.push(pokemon)
-        saveStorage()
+        if (!isTeamComplete) {
+            myTeam.push(pokemon)
+            saveStorage()
+            let successMessage = pokemon.name + 'has been added to team'
+            openAlert("success", successMessage)
+        } else {
+            openAlert("error", "can't add more than 6 pokemon")
+        }
         loadStorage()
     }
 
     const removeToTeam = (pokemonToRemove) => {
-        console.log(pokemonToRemove)
         let pokemonIndex = myTeam.findIndex(x => x.name === pokemonToRemove.name);
-        console.log(pokemonIndex)
         if (pokemonIndex !== -1) {
             myTeam.splice(pokemonIndex, 1);
         }
-
         saveStorage()
         loadStorage()
+        let successMessage = pokemonToRemove.name + 'has been remove from team'
+        openAlert("success", successMessage)
     }
+
+    const openAlert = (alertType, alertMessage) => {
+        setOpenAlert(true);
+        setAlertType(alertType);
+        setAlertMessage(alertMessage);
+    };
+
+    const closeAlert = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenAlert(false);
+    };
 
     if (pokemons.length !== 0) return (
         <div>
+            <Snackbar open={isAlertOpen} autoHideDuration={6000} onClose={closeAlert}>
+                <Alert onClose={closeAlert} severity={alertType} sx={{ width: '100%' }}>
+                    {alertMessage}
+                </Alert>
+            </Snackbar>
             <h1>My pokemon team</h1>
-            {                
+            {
                 myTeam.map((poke, index) => {
                     return (
-                            <img id={index} src={GetPokemonImage(poke.url)}></img>
+                        <img id={index} src={GetPokemonImage(poke.url)}></img>
 
                     )
                 })
@@ -207,6 +248,16 @@ export const Pokemons = () => {
                                     </Grid>
                                 </Grid>
                                 <Grid container justifyContent="center" spacing={3}>
+                                    <Grid item xs={4}>
+                                        <h3>Stats</h3>
+                                        {
+                                            pokemonDetails?.stats?.map((stat, index) => {
+                                                return (
+                                                    <p id={index}>{stat.stat.name} : {stat.base_stat}</p>
+                                                )
+                                            })
+                                        }
+                                    </Grid>
                                     <Grid item xs={4}>
                                         <h3>Types :</h3>
                                         {
